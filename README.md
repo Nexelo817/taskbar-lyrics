@@ -3,8 +3,8 @@
 PCで再生中の曲の**同期歌詞を、Windowsのタスクバーの中に表示**する小さなツールです。
 Spotify や ブラウザの YouTube など、Windowsのメディア再生情報に対応するアプリで動きます。
 
-> ここにスクリーンショットを貼ってください（`docs/screenshot.png` など）。
-> 公開前に、個人情報（ユーザー名・ファイル名・所属名など）が写っていないか確認し、タスクバー部分だけをトリミングするのがおすすめです。
+<img width="732" height="39" alt="image" src="https://github.com/user-attachments/assets/78a529bf-1bf9-4b91-bcdf-1c6a6781b0e8" />
+
 
 ## 特徴
 
