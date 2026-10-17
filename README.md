@@ -3,8 +3,8 @@
 PCで再生中の曲の**同期歌詞を、Windowsのタスクバーの中に表示**する小さなツールです。
 Spotify や ブラウザの YouTube など、Windowsのメディア再生情報に対応するアプリで動きます。
 
-<img width="689" height="40" alt="image" src="https://github.com/user-attachments/assets/49ea10ad-d8de-479d-8f7b-cb3fec919aec" />
-
+> ここにスクリーンショットを貼ってください（`docs/screenshot.png` など）。
+> 公開前に、個人情報（ユーザー名・ファイル名・所属名など）が写っていないか確認し、タスクバー部分だけをトリミングするのがおすすめです。
 
 ## 特徴
 
@@ -34,6 +34,7 @@ python taskbar_lyrics.py
 
 ### B. EXEを作る
 `build_exe.bat` をダブルクリックすると、`dist\TaskbarLyrics.exe` ができます（Python 3.12 があれば自動で使います）。
+初回は数分かかることがあります。OneDriveの中のフォルダだと、さらに遅くなることがあります。
 
 ## 使い方
 
@@ -54,6 +55,10 @@ python taskbar_lyrics.py
 - 歌詞の検索のために、**曲名・アーティスト名・アルバム名・長さだけ**を LRCLIB（lrclib.net）に送ります。それ以外の情報は送りません。解析・広告・テレメトリはありません。
 - 設定・ログ・歌詞キャッシュ・自作 `.lrc` は、すべて自分のPCの `%APPDATA%\TaskbarLyrics\` に保存されます。メニューの「歌詞キャッシュを削除」で消せます。
 - LRCLIB への負荷を減らすため、見つからなかった曲は3日間は再検索せず、30秒未満・15分超の再生は検索しません。
+
+## 更新履歴
+
+[CHANGELOG.md](CHANGELOG.md) を参照してください。
 
 ## 免責
 

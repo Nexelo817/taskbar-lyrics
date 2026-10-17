@@ -12,6 +12,7 @@ import bisect
 import ctypes
 import ctypes.wintypes
 import difflib
+import hashlib
 import json
 import logging
 import os
@@ -113,7 +114,7 @@ shared = {"active": False, "title": "", "artist": "", "art": None, "lyrics": Non
 
 
 # ===== 歌詞取得 =====
-APP_VERSION = "1.0.1"
+APP_VERSION = "1.2.0"
 MATCH_VERSION = 2            # 検索ロジックを変えたら上げる（古い「見つからない」の記憶を無効にする）
 PROJECT_URL = "https://github.com/Nexelo817/taskbar-lyrics"
 LRCLIB = "https://lrclib.net/api"
@@ -449,13 +450,71 @@ async def read_thumbnail(info):
         return None
 
 
+BROWSER_IDS = ("chrome", "msedge", "edge", "brave", "firefox", "opera", "vivaldi", "chromium", "iexplore")
+
+
+def is_browser(session):
+    try:
+        sid = (session.source_app_user_model_id or "").lower()
+    except Exception:
+        return False
+    return any(b in sid for b in BROWSER_IDS)
+
+
+class ArtTracker:
+    """ジャケット画像の取得をまとめて面倒を見る。
+    - ブラウザは動画が変わった直後、本物の画像が届く前に「ブラウザのアイコン」を返すことがある。
+      そのため数秒間は取り直して、本物が届いたら入れ替える。
+    - 取り直しで画像が入れ替わったら、前の画像はブラウザのアイコンだったと覚えて、以後は出さない。"""
+    SCHEDULE = (1.0, 2.5, 4.5, 8.0)   # 曲が変わってから、取り直す時刻(秒)
+
+    def __init__(self):
+        self.generic = set()   # ブラウザのアイコンだと分かった画像のハッシュ
+        self.reset(None, False)
+
+    def reset(self, key, browser):
+        self.key, self.browser = key, browser
+        self.t0 = time.perf_counter()
+        self.idx = 0
+        self.last = 0.0
+        self.hash = None
+
+    def accept(self, data):
+        """取得した画像を判定して、使う画像(bytes)か、出さない(None)を返す"""
+        if not data:
+            return None
+        h = hashlib.md5(data).hexdigest()
+        if self.browser:
+            if h in self.generic:
+                return None
+            if self.hash and self.hash != h:   # 画像が入れ替わった = 前のはアイコンだった
+                self.generic.add(self.hash)
+                logging.info("cover: browser icon detected, will be hidden from now on")
+        self.hash = h
+        return data
+
+    def due(self, has_art):
+        """いま取り直すべきか"""
+        if not self.browser and has_art:
+            return False  # Spotify等は、最初に取れていれば取り直さない
+        el = time.perf_counter() - self.t0
+        if self.idx < len(self.SCHEDULE):
+            return el >= self.SCHEDULE[self.idx]
+        return (not has_art) and el < 30 and el - self.last >= 2.0  # 画像が無いままなら、30秒までは2秒おきに
+
+    def checked(self):
+        self.last = time.perf_counter() - self.t0
+        if self.idx < len(self.SCHEDULE):
+            self.idx += 1
+
+
 async def worker():
     mgr = await MediaManager.request_async()
     key = None
     lyrics = None
     cache = {}
     anchor = None      # (再生位置, 取得時刻, 再生中か) 画面側がこれを基準に滑らかに進める
-    art_tries = 0
+    tracker = ArtTracker()
     retry_after = 0.0
     n = 0
     while True:
@@ -472,12 +531,13 @@ async def worker():
                 if k != key and time.perf_counter() >= retry_after:
                     key = k
                     anchor = None
+                    tracker.reset(k, is_browser(s))
                     shared.update(pos=0.0, stamp=time.perf_counter())
                     was_active = shared["active"]
                     art = None
                     if was_active:  # 表示中なら消さずに、曲情報だけ先に切り替える
                         shared.update(lyrics=None, title=info.title, artist=info.artist)
-                        art = await read_thumbnail(info)
+                        art = tracker.accept(await read_thumbnail(info))
                         shared["art"] = art
                     if k in cache:
                         lyrics, src = cache[k], "memory"
@@ -495,14 +555,17 @@ async def worker():
                         retry_after = time.perf_counter() + 20
                     if lyrics:
                         if not was_active:
-                            art = await read_thumbnail(info)
-                        art_tries = 0
+                            art = tracker.accept(await read_thumbnail(info))
                         shared.update(title=info.title, artist=info.artist, art=art, lyrics=lyrics)
                     else:
                         shared["lyrics"] = None
-                elif lyrics and shared["art"] is None and art_tries < 5 and n % 5 == 0:
-                    art_tries += 1
-                    shared["art"] = await read_thumbnail(info)
+                elif lyrics and tracker.due(shared["art"] is not None):
+                    data = await read_thumbnail(info)
+                    tracker.checked()
+                    if data is not None:            # 取得に失敗したときは今の画像を残す
+                        art2 = tracker.accept(data)
+                        if art2 != shared["art"]:
+                            shared["art"] = art2
 
                 if lyrics:
                     playing = s.get_playback_info().playback_status == PlayStatus.PLAYING
