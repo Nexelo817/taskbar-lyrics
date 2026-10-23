@@ -8,8 +8,6 @@ Spotify や ブラウザの YouTube など、Windowsの「再生中」情報に�
 !<img width="689" height="40" alt="image" src="https://github.com/user-attachments/assets/9749ee94-e492-479c-8a45-2bf63ae1f109" />
 
 
-> 画像の歌詞とジャケットは、サンプルです。
-
 > **現在は、ベータ版（v2.3.1-beta.1）です。** 安定版（v1.2）に、歌詞カード・翻訳・単語同期・取得元の表示などを足した版で、不具合があるかもしれません。
 > ベータ版は、[Releases の一覧](https://github.com/Nexelo817/taskbar-lyrics/releases) の、「Pre-release」と書かれたものです。見つけた不具合は、[Issues](https://github.com/Nexelo817/taskbar-lyrics/issues) で教えてください。
 
