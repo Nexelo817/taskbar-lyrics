@@ -5,7 +5,8 @@
 PCで再生中の曲の**同期歌詞を、Windowsのタスクバーの中に表示**する小さなツールです。
 Spotify や ブラウザの YouTube など、Windowsの「再生中」情報に対応するアプリで、そのまま動きます。
 
-![Taskbar Lyrics](docs/header.png)
+!<img width="689" height="40" alt="image" src="https://github.com/user-attachments/assets/9749ee94-e492-479c-8a45-2bf63ae1f109" />
+
 
 > 画像の歌詞とジャケットは、サンプルです。
 
