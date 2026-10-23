@@ -262,7 +262,7 @@ tests/                 ユニットテスト
 - 会社・学校の管理下のPCでは、ソフトの導入ルールに従ってください
 - 無保証です
 - コード：[MIT License](LICENSE)
-- 歌詞データ：[LRCLIB](https://lrclib.net) 提供。任意で、[LyricsPlus](https://lyricsplus.prjktla.my.id)（運営チームの許可のもと、利用規約と、表示・保存のルールに従って使用）
+- 歌詞データ：[LRCLIB](https://lrclib.net) 提供。任意で、[LyricsPlus](https://lyricsplus.prjktla.my.id)
 - 使用ライブラリ：[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（PySide6 は LGPL-3.0）
 - 機能の参考：[YTM_Immersion](https://github.com/naikaku1/YTM_Immersion)（MIT License）。コードは、このツール用に新しく書いています
 
