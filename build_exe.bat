@@ -33,7 +33,7 @@ pip install winsdk requests PySide6 pyinstaller
 if errorlevel 1 goto error
 
 echo [3/4] Building EXE...
-pyinstaller --noconfirm --clean --onefile --noconsole --name TaskbarLyrics --collect-all winsdk taskbar_lyrics.py
+pyinstaller --noconfirm --clean --onefile --noconsole --name TaskbarLyrics --collect-all winsdk --hidden-import tblyrics.player taskbar_lyrics.py
 if errorlevel 1 goto error
 
 echo [4/4] Done!
